@@ -1,0 +1,619 @@
+(function() {
+  'use strict';
+
+  // Create an FPS counter element
+  var fpsCounter = document.createElement('div');
+  fpsCounter.style.position = 'fixed';
+  fpsCounter.style.bottom = '10px';
+  fpsCounter.style.right = '10px';
+  fpsCounter.style.background = 'rgba(0, 0, 0, 0.7)';
+  fpsCounter.style.color = '#fff';
+  fpsCounter.style.padding = '5px';
+  fpsCounter.style.fontFamily = 'Arial, sans-serif';
+  fpsCounter.style.fontSize = '12px';
+  document.body.appendChild(fpsCounter);
+
+  var frameCount = 0;
+  var fps = 0;
+  var lastTime = performance.now();
+
+  function updateFPS() {
+    var currentTime = performance.now();
+    var delta = currentTime - lastTime;
+    frameCount++;
+
+    if (delta >= 1000) {
+      fps = Math.round((frameCount * 1000) / delta);
+      frameCount = 0;
+      lastTime = currentTime;
+    }
+
+    fpsCounter.textContent = 'FPS: ' + fps;
+
+    // Request the next frame
+    requestAnimationFrame(updateFPS);
+  }
+
+  // Start tracking FPS
+  updateFPS();
+})();
+
+(function() {
+  'use strict';
+
+  // Create a crosshair element
+  var crosshair = document.createElement('div');
+  crosshair.style.position = 'fixed';
+  crosshair.style.top = '50%';
+  crosshair.style.left = '50%';
+  crosshair.style.transform = 'translate(-50%, -50%)';
+  crosshair.style.width = '2px'; // Increase the width to 4 pixels
+  crosshair.style.height = '200px'; // Increase the height to 60 pixels
+  crosshair.style.background = '#00ff00';
+  crosshair.style.pointerEvents = 'none';
+  document.body.appendChild(crosshair);
+
+  var horizontalLine = document.createElement('div');
+  horizontalLine.style.position = 'fixed';
+  horizontalLine.style.top = '50%';
+  horizontalLine.style.left = '50%';
+  horizontalLine.style.transform = 'translate(-50%, -50%)';
+  horizontalLine.style.width = '200px'; // Increase the width to 60 pixels
+  horizontalLine.style.height = '2px'; // Increase the height to 4 pixels
+  horizontalLine.style.background = '#00ff00';
+  horizontalLine.style.pointerEvents = 'none';
+  document.body.appendChild(horizontalLine);
+})();
+
+
+(function() {
+  'use strict';
+
+  var lastMouseX = null;
+  var lastMouseY = null;
+  var lastTimestamp = performance.now();
+
+  // Create a speedometer element
+  var speedometer = document.createElement('div');
+  speedometer.style.position = 'fixed';
+  speedometer.style.top = '10px';
+  speedometer.style.left = '10px';
+  speedometer.style.background = 'rgba(0, 0, 0, 0.7)';
+  speedometer.style.color = '#fff';
+  speedometer.style.padding = '5px';
+  speedometer.style.fontFamily = 'Arial, sans-serif';
+  speedometer.style.fontSize = '12px';
+  document.body.appendChild(speedometer);
+
+  function calculateSpeed(currentX, currentY, timestamp) {
+    if (lastMouseX === null || lastMouseY === null) {
+      return 0;
+    }
+
+    var deltaX = currentX - lastMouseX;
+    var deltaY = currentY - lastMouseY;
+    var deltaTime = timestamp - lastTimestamp;
+    var speedX = Math.abs(deltaX / deltaTime * 1000);
+    var speedY = Math.abs(deltaY / deltaTime * 1000);
+    var speed = Math.sqrt(speedX * speedX + speedY * speedY);
+    return Math.round(speed);
+  }
+
+  function updateSpeed(event) {
+    var currentMouseX = event.clientX;
+    var currentMouseY = event.clientY;
+    var currentTimestamp = performance.now();
+
+    var speed = calculateSpeed(currentMouseX, currentMouseY, currentTimestamp);
+    speedometer.textContent = 'Mouse Speed: ' + speed + ' pixels/sec';
+
+    lastMouseX = currentMouseX;
+    lastMouseY = currentMouseY;
+    lastTimestamp = currentTimestamp;
+  }
+
+  // Attach mousemove event listener to track speed
+  document.addEventListener('mousemove', updateSpeed);
+})();
+
+(function() {
+  'use strict';
+
+  // Create a message box element
+  var messageBox = document.createElement('div');
+  messageBox.style.position = 'fixed';
+  messageBox.style.top = '40px';
+  messageBox.style.left = '10px';
+  messageBox.style.width = '300px';
+  messageBox.style.height = '25px';
+  messageBox.style.background = 'rgba(0, 0, 0, 0.7)';
+  messageBox.style.color = '#fff';
+  messageBox.style.padding = '10px';
+  messageBox.style.fontFamily = 'Arial, sans-serif';
+  messageBox.style.fontSize = '12px';
+  messageBox.style.overflow = 'auto';
+  document.body.appendChild(messageBox);
+
+  // Override the console.log function to display messages in the box
+  var originalConsoleLog = console.log;
+  console.log = function() {
+    // Convert the arguments to an array and join them into a single string
+    var message = Array.prototype.slice.call(arguments).join(' ');
+
+    // Create a new message element
+    var messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageBox.appendChild(messageElement);
+
+    // Scroll to the bottom of the message box
+    messageBox.scrollTop = messageBox.scrollHeight;
+
+    // Call the original console.log function
+    originalConsoleLog.apply(console, arguments);
+  };
+})();
+
+
+//xxxxxxxxxxxxxxxxx
+
+(function() {
+  'use strict';
+
+  // Create a circle element
+  var circle = document.createElement('div');
+  circle.style.position = 'fixed';
+  circle.style.top = '50%';
+  circle.style.left = '50%';
+  circle.style.transform = 'translate(-50%, -50%)';
+  circle.style.width = '60px';
+  circle.style.height = '60px';
+  circle.style.border = '2px solid #00ff00';
+  circle.style.borderRadius = '50%';
+  document.body.appendChild(circle);
+
+  // Add event listeners for right mouse button press and release
+  var isResizing = false;
+  var originalSize = {
+    width: circle.offsetWidth,
+    height: circle.offsetHeight
+  };
+
+  document.addEventListener('mousedown', function(event) {
+    if (event.button === 2) { // Right mouse button
+      isResizing = true;
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('mouseup', function(event) {
+    if (event.button === 2) { // Right mouse button
+      isResizing = false;
+      circle.style.width = originalSize.width + 'px';
+      circle.style.height = originalSize.height + 'px';
+      event.preventDefault();
+    }
+  });
+
+  // Resize the circle while the right mouse button is held
+  document.addEventListener('mousemove', function(event) {
+    if (isResizing) {
+      var mouseX = event.clientX;
+      var mouseY = event.clientY;
+      var rect = circle.getBoundingClientRect();
+      var circleX = rect.left + rect.width / 2;
+      var circleY = rect.top + rect.height / 2;
+      var distance = Math.sqrt(Math.pow(mouseX - circleX, 2) + Math.pow(mouseY - circleY, 2));
+      var maxDistance = Math.max(rect.width / 2, rect.height / 2);
+      var ratio = 1 - distance / maxDistance;
+      var newSize = Math.max(originalSize.width * ratio, 20); // Minimum size of 10px
+      circle.style.width = newSize + 'px';
+      circle.style.height = newSize + 'px';
+    }
+  });
+})();
+
+//xxxxxxxxxxxx
+
+(function() {
+  'use strict';
+
+  // Create a text box for entering commands
+  var inputBox = document.createElement('input');
+  inputBox.type = 'text';
+  inputBox.style.position = 'fixed';
+  inputBox.style.top = '85px';
+  inputBox.style.left = '10px';
+  inputBox.style.zIndex = '9999';
+  document.body.appendChild(inputBox);
+
+  // Function to execute a command
+  function executeCommand(command) {
+    // Replace with your own commands or logic
+    if (command === 'test') {
+      console.log('working');
+    } else if (command === 'time') {
+      console.log('The current time is: ' + new Date());
+    } else if (command === 'greet') {
+      console.log('Greetings!');
+    } else if (command === 'contact') {
+      console.log('yandex#2467(Discord)');
+    } else if (command === 'help') {
+      console.log('Available commands: test, time, greet, contact, help');
+    } else if (command === 'about') {
+      console.log('This is a script that resembles dev tools (inpso from ARC9)');
+    } else if (command === 'version') {
+      console.log('Version 1.0');
+    } else if (command === 'credit') {
+      console.log('Author: Yandex');
+    } else if (command === 'force_cheat1') {
+      // Code to be executed when "activate1" command is given
+      console.log('Injecting...');
+
+        const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function (...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].material.wireframe = true; //here
+    a[0].renderOrder = 999999;
+    let hue = 0;
+
+  }
+};
+      console.log('injection finished');
+    } else if (command === 'force_cheat2') {
+      // Code to be executed when "activate2" command is given
+      console.log('Injecting...');
+                 const wireFrameView4 = {
+    enabled: false,
+    toggle: function() {
+        this.enabled = !this.enabled;
+        if (this.enabled) {
+            this.enableWireframe();
+        } else {
+            this.disableWireframe();
+        }
+    },
+    enableWireframe: function() {
+        console.log("Enabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false; //here 2
+                child.material.alphaTest = -100
+                child.material.name = NaN;
+                child.material.id = NaN;
+                child.material.precision = "highp";
+            }
+        }
+    },
+    disableWireframe: function() {
+        console.log("Disabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false;
+                child.material.alphaTest = 0;
+                child.material.name = "";
+                child.material.id = 0;
+                child.material.precision = "mediump";
+            }
+        }
+    }
+};
+
+document.addEventListener("keydown", function(event) {
+    if (event.code === "KeyF") {
+        wireFrameView4.toggle();
+    } else if (event.code === "KeyV") {
+        wireFrameView4.disableWireframe();
+    }
+});
+
+const push4 = Array.prototype.push;
+Array.prototype.push = function(...args) {
+    push4.apply(this, args);
+    if (args[0] && args[0].material && args[0].type == "Mesh") {
+        if (wireFrameView4.enabled) {
+            args[0].material.wireframe = true; // set to true here
+            args[0].material.alphaTest = -100;
+
+            args[0].material.name = NaN;
+            args[0].material.id = NaN;
+            args[0].material.precision = "highp";
+        } else {
+            args[0].material.wireframe = false;
+            args[0].material.alphaTest = 0;
+            args[0].material.name = "";
+            args[0].material.id = 0;
+            args[0].material.precision = "mediump";
+        }
+        args[0].material.needsUpdate = false;
+    }
+};
+      console.log('injection finished');
+    } else if (command === 'force_cheat3') {
+
+      console.log('Injecting...');
+      let playersVisible = true;
+
+window.addEventListener('keyup', function(event) {
+    if (event.code === 'KeyV') {
+        playersVisible = !playersVisible;
+    }
+});
+
+const THREE = window.THREE;
+const geo = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+const material = new THREE.MeshBasicMaterial({
+    color: '#ff00ff',
+    wireframe: false,
+    transparent: true,
+    opacity: 0.5,
+    depthTest: false
+});
+
+// Prevents items from getting dropped when detected
+Object.defineProperty(window, 'THREE', { get() { return undefined; } });
+
+function makeHitbox() {
+    let hitbox = new THREE.Mesh(geo, material);
+    hitbox.scale.set(0.4, 1.2, 0.4);
+    hitbox.position.y += 0.6; // Translate the hitbox higher
+    return hitbox;
+}
+
+let gameScene;
+WeakMap.prototype.set = new Proxy(WeakMap.prototype.set, {
+    apply(t, args, [scene]) {
+        if (scene.type === 'Scene') {
+            if (scene.children.length === 9) {
+                window.scene = scene;
+                gameScene = scene;
+            }
+        }
+        return Reflect.apply(...arguments);
+    }
+});
+
+window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
+    apply(target, args, args2) {
+        args2[0] = new Proxy(args2[0], {
+            apply() {
+                if (gameScene == null) {
+                    return;
+                }
+
+                const allEntities = gameScene.children[5].children;
+                for (let i = 0; i < allEntities.length; i++) {
+                    const entity = allEntities[i];
+                    if (entity.children.length === 0) {
+                        continue;
+                    }
+                    if (!entity.HitBox) {
+                        const name = entity.children[0].name;
+                        // Game scene saves name as parachute, hence can be used to recognize a player
+                        if (name === 'Parachute') {
+                            entity.isPlayer = true;
+                            // Generates a hitbox for the player
+                            let hitbox = makeHitbox();
+                            entity.add(hitbox);
+                            entity.HitBox = hitbox;
+                        }
+                    }
+                    if (entity.HitBox != null) {
+                        entity.HitBox.visible = playersVisible;
+                    }
+                }
+                return Reflect.apply(...arguments);
+            }
+        });
+        return Reflect.apply(...arguments);
+    }
+});
+      // For example:
+      console.log('injection finished');
+    } else {
+      console.log('Invalid command');
+    }
+  }
+
+  // Execute command on Enter key press
+  inputBox.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      var userCommand = inputBox.value.trim();
+      executeCommand(userCommand);
+      inputBox.value = '';
+    }
+  });
+})();
+
+//xxxxxxxxxxxxxxxxxx
+
+(function() {
+  // Create a box to display pressed keys
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.bottom = '10px';
+  box.style.left = '10px';
+  box.style.padding = '5px';
+  box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  box.style.color = '#fff';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontSize = '14px';
+  box.style.zIndex = '9999';
+  box.textContent = 'Pressed Keys: ';
+
+  // Track pressed keys
+  const pressedKeys = new Set();
+
+  // Add event listeners for keydown and keyup events
+  window.addEventListener('keydown', event => {
+    const key = event.key.toLowerCase();
+    pressedKeys.add(key);
+    updateDisplay();
+  });
+
+  window.addEventListener('keyup', event => {
+    const key = event.key.toLowerCase();
+    pressedKeys.delete(key);
+    updateDisplay();
+  });
+
+  // Function to update the displayed keys
+  function updateDisplay() {
+    box.textContent = 'Key track: ' + Array.from(pressedKeys).join(', ');
+  }
+
+  // Add the box to the document body
+  document.body.appendChild(box);
+})();
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+(function() {
+  // Create a box to display the loading speed
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.top = '10px';
+  box.style.right = '10px';
+  box.style.padding = '5px';
+  box.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  box.style.color = '#fff';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontSize = '14px';
+  box.style.zIndex = '9999';
+
+  // Function to calculate the loading speed of the page
+  function calculateLoadingSpeed() {
+    const startTime = performance.timing.navigationStart;
+    const endTime = performance.timing.loadEventEnd;
+    const loadingTime = endTime - startTime;
+    return loadingTime;
+  }
+
+  // Function to update the displayed loading speed
+  function updateDisplay() {
+    const loadingSpeed = calculateLoadingSpeed();
+    box.textContent = `Loading Speed: ${loadingSpeed}ms`;
+  }
+
+  // Add event listener for load event
+  window.addEventListener('load', () => {
+    updateDisplay();
+  });
+
+  // Add the box to the document body
+  document.body.appendChild(box);
+})();
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+(function() {
+  // Create a box to display "ADS"
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.top = '30%';
+  box.style.left = '30%';
+  box.style.transform = 'translate(-50%, -50%)';
+  box.style.padding = '10px';
+  box.style.backgroundColor = 'rgba(0, 0, 0, 0.)';
+  box.style.color = '#00ff00';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontSize = '24px';
+  box.style.zIndex = '9999';
+  box.style.display = 'none';
+  box.textContent = 'ADS';
+
+  // Add event listeners for mouseup and mousedown events
+  window.addEventListener('mousedown', event => {
+    if (event.button === 2) {
+      box.style.display = 'block';
+    }
+  });
+
+  window.addEventListener('mouseup', event => {
+    if (event.button === 2) {
+      box.style.display = 'none';
+    }
+  });
+
+  // Add the box to the document body
+  document.body.appendChild(box);
+})();
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+(function() {
+  // Create a box to display "ADS"
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.top = '35%';
+  box.style.left = '30%';
+  box.style.transform = 'translate(-50%, -50%)';
+  box.style.padding = '10px';
+  box.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+  box.style.color = '#00ff00';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontSize = '24px';
+  box.style.zIndex = '9999';
+  box.style.display = 'none';
+  box.textContent = 'FIRE';
+
+  // Add event listeners for mouseup and mousedown events
+  window.addEventListener('mousedown', event => {
+    if (event.button === 0) {
+      box.style.display = 'block';
+    }
+  });
+
+  window.addEventListener('mouseup', event => {
+    if (event.button === 0) {
+      box.style.display = 'none';
+    }
+  });
+
+  // Add the box to the document body
+  document.body.appendChild(box);
+})();
+
+
+//xxxxxxxxxxxxxxxxxxxxxxxxx
+
+(function() {
+  // Create a box to display "RELOADING..."
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.bottom = '40%';
+  box.style.left = '30%';
+  box.style.transform = 'translate(-50%, -50%)';
+  box.style.padding = '10px';
+  box.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+  box.style.color = '#ff0000';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontSize = '24px';
+  box.style.zIndex = '9999';
+  box.textContent = 'RELOADING';
+  box.style.display = 'none';
+
+  // Function to show the reloading text for 1.5 seconds
+  function showReloadingText() {
+    box.style.display = 'block';
+    setTimeout(() => {
+      box.style.display = 'none';
+    }, 1500);
+  }
+
+  // Add event listener for keydown event
+  window.addEventListener('keydown', event => {
+    if (event.key === 'r' || event.key === 'R') {
+      showReloadingText();
+    }
+  });
+
+  // Add the box to the document body
+  document.body.appendChild(box);
+})();
