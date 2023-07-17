@@ -1,0 +1,57 @@
+(function () {
+  const containerElement = document.createElement('div');
+  containerElement.style.position = 'fixed';
+  containerElement.style.top = '50%';
+  containerElement.style.left = '50%';
+  containerElement.style.transform = 'translate(-50%, -50%)';
+  containerElement.style.width = '300px';
+  containerElement.style.height = '300px'; // Set the desired height for the container
+  containerElement.style.border = '1px solid black';
+  containerElement.style.padding = '10px';
+  containerElement.style.backgroundColor = 'white';
+  containerElement.style.overflow = 'auto'; // Enable scrolling within the container
+  containerElement.style.zIndex = '9999';
+  document.body.appendChild(containerElement);
+
+  const spanList = document.createElement('ul');
+  spanList.style.listStyleType = 'none';
+  containerElement.appendChild(spanList);
+
+  const spans = Array.from(document.body.getElementsByTagName('span'));
+
+  spans.forEach((span, index) => {
+    const listItem = document.createElement('li');
+
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.value = span.textContent;
+    inputField.style.marginRight = '10px';
+    listItem.appendChild(inputField);
+
+    const updateButton = document.createElement('button');
+    updateButton.textContent = 'Update';
+    listItem.appendChild(updateButton);
+
+    listItem.addEventListener('mouseover', function () {
+      span.style.backgroundColor = 'rgba(0, 255, 0, 0.3)';
+    });
+
+    listItem.addEventListener('mouseout', function () {
+      span.style.backgroundColor = '';
+    });
+
+    updateButton.addEventListener('click', function () {
+      span.textContent = inputField.value;
+    });
+
+    spanList.appendChild(listItem);
+  });
+
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Close';
+  containerElement.appendChild(closeButton);
+
+  closeButton.addEventListener('click', function () {
+    document.body.removeChild(containerElement);
+  });
+})();
