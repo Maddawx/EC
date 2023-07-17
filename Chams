@@ -1,0 +1,14 @@
+  const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function (...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].material.wireframe = true; //here
+    a[0].renderOrder = 999999;
+    let hue = 0;
+
+  }
+};
