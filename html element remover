@@ -1,0 +1,60 @@
+(function () {
+  const containerElement = document.createElement('div');
+  containerElement.style.position = 'fixed';
+  containerElement.style.top = '50%';
+  containerElement.style.left = '50%';
+  containerElement.style.transform = 'translate(-50%, -50%)';
+  containerElement.style.width = '300px';
+  containerElement.style.height = '400px'; // Adjust the height as per your preference
+  containerElement.style.border = '1px solid black';
+  containerElement.style.padding = '10px';
+  containerElement.style.backgroundColor = 'white';
+  containerElement.style.overflow = 'auto'; // Enable vertical scrolling
+  containerElement.style.zIndex = '9999';
+  document.body.appendChild(containerElement);
+
+  const elementList = document.createElement('ul');
+  elementList.style.listStyleType = 'none';
+  elementList.style.padding = '0';
+  containerElement.appendChild(elementList);
+
+  const elements = Array.from(document.body.querySelectorAll('*'));
+
+  elements.forEach((element, index) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = element.tagName;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    listItem.appendChild(deleteButton);
+
+    listItem.addEventListener('mouseover', function () {
+      element.style.outline = '2px solid red';
+    });
+
+    listItem.addEventListener('mouseout', function () {
+      element.style.outline = '';
+    });
+
+    deleteButton.addEventListener('click', function () {
+      if (element !== containerElement && element !== elementList) {
+        deleteElement(element);
+        elementList.removeChild(listItem);
+      }
+    });
+
+    elementList.appendChild(listItem);
+  });
+
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Close';
+  containerElement.appendChild(closeButton);
+
+  closeButton.addEventListener('click', function () {
+    document.body.removeChild(containerElement);
+  });
+
+  function deleteElement(element) {
+    element.parentNode.removeChild(element);
+  }
+})();
