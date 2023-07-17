@@ -1,0 +1,34 @@
+(function() {
+  var previousTimestamp = null;
+  var previousDeltaY = null;
+
+  // Create a container element to display the scroll wheel speed
+  var container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.top = '10px';
+  container.style.left = '10px';
+  container.style.backgroundColor = '#fff';
+  container.style.padding = '10px';
+  container.style.border = '1px solid #ccc';
+  document.body.appendChild(container);
+
+  // Function to calculate scroll wheel speed and update the display
+  function calculateScrollSpeed(event) {
+    var currentTimestamp = performance.now();
+    var currentDeltaY = event.deltaY;
+
+    if (previousTimestamp && previousDeltaY) {
+      var timeDiff = currentTimestamp - previousTimestamp;
+      var distanceDiff = Math.abs(currentDeltaY - previousDeltaY);
+      var speed = (distanceDiff / timeDiff) * 1000;
+
+      container.textContent = 'Scroll Speed: ' + speed.toFixed(2) + ' pixels/second';
+    }
+
+    previousTimestamp = currentTimestamp;
+    previousDeltaY = currentDeltaY;
+  }
+
+  // Event listener to track the scroll wheel events
+  window.addEventListener('wheel', calculateScrollSpeed);
+})();
