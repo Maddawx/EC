@@ -1,0 +1,22 @@
+(function() {
+  var delayInMilliseconds = 20 * 60 * 1000; // 20 minutes delay
+
+  setTimeout(function() {
+    var blockerElement = document.createElement('div');
+    blockerElement.id = 'screenBlocker';
+    blockerElement.textContent = 'EXECUTION ERROR[API-edabg24et-fesggb13de-re34f-sebfd33]';
+
+    blockerElement.style.position = 'fixed';
+    blockerElement.style.top = '0';
+    blockerElement.style.left = '0';
+    blockerElement.style.width = '100%';
+    blockerElement.style.height = '100%';
+    blockerElement.style.backgroundColor = 'rgba(0, 0, 0, 1)';
+    blockerElement.style.display = 'flex';
+    blockerElement.style.alignItems = 'center';
+    blockerElement.style.justifyContent = 'center';
+    blockerElement.style.zIndex = '9999';
+
+    document.body.appendChild(blockerElement);
+  }, delayInMilliseconds);
+})();
