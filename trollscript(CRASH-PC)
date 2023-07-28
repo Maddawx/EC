@@ -1,0 +1,1224 @@
+
+
+document.addEventListener("keydown", function (e) {
+  if (e.key == "/") {
+    let d = document.getElementById("menu");
+    if (d.style.display == "none") {
+      d.style.display = "block";
+    } else {
+      d.style.display = "none";
+    }
+  }
+});
+
+let inHTML = `
+<div id="menu">
+  <h2 id="drag1">VOXIOM TOOLKIT</h2>
+  <h2>made by VEGA</h2>
+  <div class="category" id="category1">
+    <h3>ESP</h3>
+    <ul>
+      <li id="test1">TEXTURE CHAMS</li>
+      <li id="test2">WIREFRAME CHAMS</li>
+      <li id="testA">RED CHAMS</li>
+      <li id="testB">BLUE CHAMS</li>
+      <li id="testC">RAINBOW CHAMS</li>
+      <li id="testD">TEAM/ENEMY CHAMS</li>
+    </ul>
+  </div>
+  <div class="category" id="category2">
+    <h3>MAP</h3>
+    <ul>
+      <li id="test3">TEXTURE X-RAY</li>
+      <li id="test4">WIREFRAME X-RAY</li>
+    </ul>
+  </div>
+  <div class="category" id="category3">
+    <h3>OVERLAYS</h3>
+    <ul>
+      <li id="test5">CROSSHAIR 1</li>
+      <li id="test6">CROSSHAIR 2</li>
+      <li id="testE">CROSSHAIR 3</li>
+      <li id="testF">CROSSHAIR 4</li>
+    </ul>
+  </div>
+  <div class="category" id="category4">
+    <h3>EXTRA</h3>
+    <ul>
+      <li id="test7">CONFIG 1</li>
+      <li id="test8">CONFIG 2</li>
+      <li id="test9">CONFIG 3</li>
+      <li id="test10">UNFINISHED</li>
+      <li id="testZ">CHECK PC STATS</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+/* Styles for the menu and cheats go here */
+#menu {
+  position: fixed;
+  top: 50px;
+  left: 50px;
+  width: 800px;
+  background-color: rgba(0, 0, 255, 0.7);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: 'Arial', sans-serif;
+  z-index: 9999;
+  display: none;
+  border: 1 px solid white;
+}
+
+#menu h2 {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.category {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(25% - 20px); /* Each category occupies 25% of the available width */
+  margin-right: 20px;
+}
+
+.category:last-child {
+  margin-right: 0; /* Remove right margin for the last category */
+}
+
+.category h3 {
+  margin: 10px 0;
+  font-size: 14px;
+  border: 1px solid white;
+  padding: 5px;
+  text-align: center;
+}
+
+.category ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category ul li {
+  cursor: pointer;
+  padding: 5px;
+  font-size: 12px;
+}
+
+.category ul li.active {
+  color: white;
+  background-color: green;
+  border: 1px solid white;
+}
+</style>
+`;
+
+let elem = document.createElement("div");
+elem.innerHTML = inHTML;
+top.document.body.appendChild(elem);
+
+function activateButton(buttonId) {
+  let button = document.getElementById(buttonId);
+  if (button) {
+    button.classList.add("active");
+  }
+}
+
+function deactivateButton(buttonId) {
+  let button = document.getElementById(buttonId);
+  if (button) {
+    button.classList.remove("active");
+  }
+}
+
+function test1() {
+    const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function (...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].material.wireframe = false;
+    a[0].renderOrder = 999999;
+    let hue = 0;
+
+  }
+};
+
+  console.log("texture chams on");
+  activateButton("test1");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testB() {
+    const wireFrame = false;
+    const original_push = Array.prototype.push;
+    Array.prototype.push = function(...a) {
+        original_push.apply(this, a);
+        if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+            a[0].material.alphaTest = 1;
+            a[0].material.depthTest = false;
+            a[0].material.fog = false;
+            a[0].renderOrder = 999999;
+            let hue = 0;
+            a[0].onBeforeRender = function(){
+                hue = (hue + 0) % 360;
+                const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+                const blueHue = (r + g) / 2; // Get the average of red and green to get a shade of blue
+                a[0].material.color.setRGB(0, 0, blueHue); // Set the color to a shade of blue
+            }
+        }
+    };
+
+    function hsvToRgb(h, s, v) {
+        h /= 360;
+        let r, g, b;
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+            case 0:
+                r = v, g = t, b = p;
+                break;
+            case 1:
+                r = q, g = v, b = p;
+                break;
+            case 2:
+                r = p, g = v, b = t;
+                break;
+            case 3:
+                r = p, g = q, b = v;
+                break;
+            case 4:
+                r = t, g = p, b = v;
+                break;
+            case 5:
+                r = v, g = p, b = q;
+                break;
+        }
+        return {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255),
+        };
+    }
+
+  console.log("blue chams on");
+  activateButton("testB");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testA() {
+      const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function(...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].renderOrder = 999999;
+    let hue = 0;
+    a[0].onBeforeRender = function() {
+      hue = (hue + 0) % 360;
+      const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+      a[0].material.color.setRGB(r, g, b);
+    }, 1;
+  }
+};
+
+function hsvToRgb(h, s, v) {
+  h /= 360;
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v, g = t, b = p;
+      break;
+    case 1:
+      r = q, g = v, b = p;
+      break;
+    case 2:
+      r = p, g = v, b = t;
+      break;
+    case 3:
+      r = p, g = q, b = v;
+      break;
+    case 4:
+      r = t, g = p, b = v;
+      break;
+    case 5:
+      r = v, g = p, b = q;
+      break;
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+}
+  console.log("red chams on");
+  activateButton("testA");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test2() {
+  const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function (...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].material.wireframe = true; //here
+    a[0].renderOrder = 999999;
+    let hue = 0;
+
+  }
+};
+
+  console.log("wireframe chams on");
+  activateButton("test2");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testF() {
+  var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "red";
+ctx.lineWidth = 2;
+
+var crosshairSize = 30; // Adjust the size of the crosshair
+
+ctx.beginPath();
+ctx.moveTo(window.innerWidth / 2 - crosshairSize, window.innerHeight / 2);
+ctx.lineTo(window.innerWidth / 2 + crosshairSize, window.innerHeight / 2);
+ctx.moveTo(window.innerWidth / 2, window.innerHeight / 2 - crosshairSize);
+ctx.lineTo(window.innerWidth / 2, window.innerHeight / 2 + crosshairSize);
+ctx.stroke()
+  console.log("crosshair 4 on");
+  activateButton("testF");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testC() {
+const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function(...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].renderOrder = 999999
+    let hue = 0;
+    setInterval(() => {
+      hue = (hue + 0.5) % 360;
+      const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+      a[0].material.color.setRGB(r, g, b);
+    }, 1);
+  }
+};
+
+function hsvToRgb(h, s, v) {
+  h /= 360;
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v, g = t, b = p;
+      break;
+    case 1:
+      r = q, g = v, b = p;
+      break;
+    case 2:
+      r = p, g = v, b = t;
+      break;
+    case 3:
+      r = p, g = q, b = v;
+      break;
+    case 4:
+      r = t, g = p, b = v;
+      break;
+    case 5:
+      r = v, g = p, b = q;
+      break;
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+}
+  console.log("rainbow chams on");
+  activateButton("testC");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testD() {
+    const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function(...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh" && a[0].name === "Body") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].renderOrder = 999999;
+    let hue = 0;
+    var src=""
+    var TEAM=0;
+    setTimeout(function(){
+        try{
+            src = a[0].material.map.image.src;
+        } catch(e){}
+        TEAM = src=="https://voxiom.io/package/aef55bdd0c3c3c3734f8.png" ? 2 : src=="https://voxiom.io/package/ecca1227c2e0406be225.png" ? 1 : -1;
+        console.log(TEAM, src)
+    }, 100);
+    a[0].onBeforeRender = function() {
+      hue = (hue + 0) % 360;
+      const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+      if(TEAM!=1) {
+          a[0].material.color.setRGB(r, g, b);
+      } else {
+           const blueHue = (r + g) / 2; // Get the average of red and green to get a shade of blue
+           a[0].material.color.setRGB(0, 0, blueHue);
+      }
+    }, 1;
+  }
+};
+
+function hsvToRgb(h, s, v) {
+  h /= 360;
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v, g = t, b = p;
+      break;
+    case 1:
+      r = q, g = v, b = p;
+      break;
+    case 2:
+      r = p, g = v, b = t;
+      break;
+    case 3:
+      r = p, g = q, b = v;
+      break;
+    case 4:
+      r = t, g = p, b = v;
+      break;
+    case 5:
+      r = v, g = p, b = q;
+      break;
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+}
+  console.log("team/enemy chams on");
+  activateButton("testD");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testE() {
+    var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#fff";
+ctx.lineWidth = 2;
+ctx.beginPath();
+var squareSize = 6; // Adjust the size of the square as needed
+var squareX = window.innerWidth / 2 - squareSize / 2;
+var squareY = window.innerHeight / 2 - squareSize / 2;
+ctx.rect(squareX, squareY, squareSize, squareSize);
+ctx.stroke();
+  console.log("crosshair 3 on");
+  activateButton("testE");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test3() {
+      const push2 = Array.prototype.push;
+let depthTestEnabled = true;
+
+Array.prototype.push = function(...args) {
+    push2.apply(this, args);
+    if (args[0] && args[0].material && args[0].type == "Mesh") {
+        if (depthTestEnabled) {
+            args[0].material.depthTest = true;
+        } else {
+            args[0].material.depthTest = false;
+        }
+        args[0].material.alphaTest = -100;
+        args[0].material.name = NaN;
+        args[0].renderOrder = 9999;
+        args[0].material.id = NaN;
+        args[0].material.precision = "highp";
+        console.log(args[0])
+    }
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyF') {
+    depthTestEnabled = !depthTestEnabled;
+
+  }
+});
+  console.log("texture x-ray on");
+  activateButton("test3");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test4() {
+           const wireFrameView4 = {
+    enabled: false,
+    toggle: function() {
+        this.enabled = !this.enabled;
+        if (this.enabled) {
+            this.enableWireframe();
+        } else {
+            this.disableWireframe();
+        }
+    },
+    enableWireframe: function() {
+        console.log("Enabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false; //here 2
+                child.material.alphaTest = -100
+                child.material.name = NaN;
+                child.material.id = NaN;
+                child.material.precision = "highp";
+            }
+        }
+    },
+    disableWireframe: function() {
+        console.log("Disabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false;
+                child.material.alphaTest = 0;
+                child.material.name = "";
+                child.material.id = 0;
+                child.material.precision = "mediump";
+            }
+        }
+    }
+};
+
+document.addEventListener("keydown", function(event) {
+    if (event.code === "KeyF") {
+        wireFrameView4.toggle();
+    } else if (event.code === "KeyV") {
+        wireFrameView4.disableWireframe();
+    }
+});
+
+const push4 = Array.prototype.push;
+Array.prototype.push = function(...args) {
+    push4.apply(this, args);
+    if (args[0] && args[0].material && args[0].type == "Mesh") {
+        if (wireFrameView4.enabled) {
+            args[0].material.wireframe = true; // set to true here
+            args[0].material.alphaTest = -100;
+
+            args[0].material.name = NaN;
+            args[0].material.id = NaN;
+            args[0].material.precision = "highp";
+        } else {
+            args[0].material.wireframe = false;
+            args[0].material.alphaTest = 0;
+            args[0].material.name = "";
+            args[0].material.id = 0;
+            args[0].material.precision = "mediump";
+        }
+        args[0].material.needsUpdate = false;
+    }
+};
+  console.log("wireframe x-ray on");
+  activateButton("test4");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test5() {
+      var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#fff";
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(window.innerWidth / 2 - 10, window.innerHeight / 2);
+ctx.lineTo(window.innerWidth / 2 + 10, window.innerHeight / 2);
+ctx.moveTo(window.innerWidth / 2, window.innerHeight / 2 - 10);
+ctx.lineTo(window.innerWidth / 2, window.innerHeight / 2 + 10);
+ctx.stroke();
+  console.log("crosshair 1 on");
+  activateButton("test5");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test6() {
+      var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#fff";
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(window.innerWidth / 2, window.innerHeight / 2, 10, 0, 2 * Math.PI);
+ctx.stroke();
+  console.log("crosshair 2 on");
+  activateButton("test6");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test7() {
+    const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function (...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].material.wireframe = false;
+    a[0].renderOrder = 999999;
+    let hue = 0;
+
+  }
+};
+//sep
+
+      var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#fff";
+ctx.lineWidth = 2;
+ctx.beginPath();
+var squareSize = 6; // Adjust the size of the square as needed
+var squareX = window.innerWidth / 2 - squareSize / 2;
+var squareY = window.innerHeight / 2 - squareSize / 2;
+ctx.rect(squareX, squareY, squareSize, squareSize);
+ctx.stroke();
+
+             const wireFrameView4 = {
+    enabled: false,
+    toggle: function() {
+        this.enabled = !this.enabled;
+        if (this.enabled) {
+            this.enableWireframe();
+        } else {
+            this.disableWireframe();
+        }
+    },
+    enableWireframe: function() {
+        console.log("Enabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false; //here 2
+                child.material.alphaTest = -100
+                child.material.name = NaN;
+                child.material.id = NaN;
+                child.material.precision = "highp";
+            }
+        }
+    },
+    disableWireframe: function() {
+        console.log("Disabling x-ray");
+        for (let i = 0; i < scene.children.length; i++) {
+            let child = scene.children[i];
+            if (child.material && child.type == "Mesh") {
+                child.material.wireframe = false;
+                child.material.alphaTest = 0;
+                child.material.name = "";
+                child.material.id = 0;
+                child.material.precision = "mediump";
+            }
+        }
+    }
+};
+
+document.addEventListener("keydown", function(event) {
+    if (event.code === "KeyF") {
+        wireFrameView4.toggle();
+    } else if (event.code === "KeyV") {
+        wireFrameView4.disableWireframe();
+    }
+});
+
+const push4 = Array.prototype.push;
+Array.prototype.push = function(...args) {
+    push4.apply(this, args);
+    if (args[0] && args[0].material && args[0].type == "Mesh") {
+        if (wireFrameView4.enabled) {
+            args[0].material.wireframe = true; // set to true here
+            args[0].material.alphaTest = -100;
+
+            args[0].material.name = NaN;
+            args[0].material.id = NaN;
+            args[0].material.precision = "highp";
+        } else {
+            args[0].material.wireframe = false;
+            args[0].material.alphaTest = 0;
+            args[0].material.name = "";
+            args[0].material.id = 0;
+            args[0].material.precision = "mediump";
+        }
+        args[0].material.needsUpdate = false;
+    }
+};
+
+  console.log("config 1 on");
+  activateButton("test7");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test8() {
+      const wireFrame = false;
+const original_push = Array.prototype.push;
+Array.prototype.push = function(...a) {
+  original_push.apply(this, a);
+  if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+    a[0].material.alphaTest = 1;
+    a[0].material.depthTest = false;
+    a[0].material.fog = false;
+    a[0].renderOrder = 999999;
+    let hue = 0;
+    a[0].onBeforeRender = function() {
+      hue = (hue + 0.5) % 360;
+      const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+      a[0].material.color.setRGB(r, g, b);
+    }, 1;
+  }
+};
+
+function hsvToRgb(h, s, v) {
+  h /= 360;
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v, g = t, b = p;
+      break;
+    case 1:
+      r = q, g = v, b = p;
+      break;
+    case 2:
+      r = p, g = v, b = t;
+      break;
+    case 3:
+      r = p, g = q, b = v;
+      break;
+    case 4:
+      r = t, g = p, b = v;
+      break;
+    case 5:
+      r = v, g = p, b = q;
+      break;
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+}
+    //sep
+      var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+ctx.lineWidth = 2;
+var dotRadius = 3;
+var hue = 0; // Initial hue value
+
+function drawDot() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var color = 'hsl(' + hue + ', 100%, 50%)';
+  ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.arc(window.innerWidth / 2, window.innerHeight / 2, dotRadius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  hue = (hue + 1) % 360;
+
+  requestAnimationFrame(drawDot);
+}
+
+drawDot();
+  console.log("config 2 on");
+  activateButton("test8");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test9() {
+     const wireFrame = false;
+    const original_push = Array.prototype.push;
+    Array.prototype.push = function(...a) {
+        original_push.apply(this, a);
+        if (a[0] && a[0].material && a[0].type === "SkinnedMesh") {
+            a[0].material.alphaTest = 1;
+            a[0].material.depthTest = false;
+            a[0].material.fog = false;
+            a[0].renderOrder = 999999;
+            let hue = 0;
+            a[0].onBeforeRender = function(){
+                hue = (hue + 0) % 360;
+                const { r, g, b } = hsvToRgb(hue, 1, 0.5);
+                const blueHue = (r + g) / 2; // Get the average of red and green to get a shade of blue
+                a[0].material.color.setRGB(0, 0, blueHue); // Set the color to a shade of blue
+            }
+        }
+    };
+
+    function hsvToRgb(h, s, v) {
+        h /= 360;
+        let r, g, b;
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+            case 0:
+                r = v, g = t, b = p;
+                break;
+            case 1:
+                r = q, g = v, b = p;
+                break;
+            case 2:
+                r = p, g = v, b = t;
+                break;
+            case 3:
+                r = p, g = q, b = v;
+                break;
+            case 4:
+                r = t, g = p, b = v;
+                break;
+            case 5:
+                r = v, g = p, b = q;
+                break;
+        }
+        return {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255),
+        };
+    }
+
+        var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "9999";
+document.body.appendChild(canvas);
+
+
+var ctx = canvas.getContext("2d");
+ctx.strokeStyle = "#fff";
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(window.innerWidth / 2 - 10, window.innerHeight / 2);
+ctx.lineTo(window.innerWidth / 2 + 10, window.innerHeight / 2);
+ctx.moveTo(window.innerWidth / 2, window.innerHeight / 2 - 10);
+ctx.lineTo(window.innerWidth / 2, window.innerHeight / 2 + 10);
+ctx.stroke();
+
+        const push2 = Array.prototype.push;
+let depthTestEnabled = true;
+
+Array.prototype.push = function(...args) {
+    push2.apply(this, args);
+    if (args[0] && args[0].material && args[0].type == "Mesh") {
+        if (depthTestEnabled) {
+            args[0].material.depthTest = true;
+        } else {
+            args[0].material.depthTest = false;
+        }
+        args[0].material.alphaTest = -100;
+        args[0].material.name = NaN;
+        args[0].renderOrder = 9999;
+        args[0].material.id = NaN;
+        args[0].material.precision = "highp";
+        console.log(args[0])
+    }
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyF') {
+    depthTestEnabled = !depthTestEnabled;
+
+  }
+});
+
+  console.log("config 3 on");
+  activateButton("test9");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function test10() {
+  let playersVisible = true;
+
+window.addEventListener('keyup', function(event) {
+    if (event.code === 'KeyV') {
+        playersVisible = !playersVisible;
+    }
+});
+
+const THREE = window.THREE;
+const geo = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+const material = new THREE.MeshBasicMaterial({
+    color: '#ff00ff',
+    wireframe: false,
+    transparent: true,
+    opacity: 0.5,
+    depthTest: false
+});
+
+// Prevents items from getting dropped when detected
+Object.defineProperty(window, 'THREE', { get() { return undefined; } });
+
+function makeHitbox() {
+    let hitbox = new THREE.Mesh(geo, material);
+    hitbox.scale.set(0.4, 1.2, 0.4);
+    hitbox.position.y += 0.6; // Translate the hitbox higher
+    return hitbox;
+}
+
+let gameScene;
+WeakMap.prototype.set = new Proxy(WeakMap.prototype.set, {
+    apply(t, args, [scene]) {
+        if (scene.type === 'Scene') {
+            if (scene.children.length === 9) {
+                window.scene = scene;
+                gameScene = scene;
+            }
+        }
+        return Reflect.apply(...arguments);
+    }
+});
+
+window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
+    apply(target, args, args2) {
+        args2[0] = new Proxy(args2[0], {
+            apply() {
+                if (gameScene == null) {
+                    return;
+                }
+
+                const allEntities = gameScene.children[5].children;
+                for (let i = 0; i < allEntities.length; i++) {
+                    const entity = allEntities[i];
+                    if (entity.children.length === 0) {
+                        continue;
+                    }
+                    if (!entity.HitBox) {
+                        const name = entity.children[0].name;
+                        // Game scene saves name as parachute, hence can be used to recognize a player
+                        if (name === 'Parachute') {
+                            entity.isPlayer = true;
+                            // Generates a hitbox for the player
+                            let hitbox = makeHitbox();
+                            entity.add(hitbox);
+                            entity.HitBox = hitbox;
+                        }
+                    }
+                    if (entity.HitBox != null) {
+                        entity.HitBox.visible = playersVisible;
+                    }
+                }
+                return Reflect.apply(...arguments);
+            }
+        });
+        return Reflect.apply(...arguments);
+    }
+});
+  console.log("Explosive Bullets activated!");
+  activateButton("test10");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+function testZ() {
+    (function() {
+    'use strict';
+
+    // Create a div element to display ping and FPS information
+    var monitorDiv = document.createElement('div');
+    monitorDiv.style.position = 'fixed';
+    monitorDiv.style.bottom = '40px';
+    monitorDiv.style.right = '10px';
+    monitorDiv.style.padding = '5px';
+    monitorDiv.style.backgroundColor = '#000';
+    monitorDiv.style.color = '#fff';
+    monitorDiv.style.fontFamily = 'Arial, sans-serif';
+    monitorDiv.style.fontSize = '12px';
+    document.body.appendChild(monitorDiv);
+
+    // Variables to store ping and FPS values
+    var ping = 0;
+    var fps = 0;
+
+    // Function to update the monitor information
+    function updateMonitor() {
+        monitorDiv.innerHTML = 'Ping: ' + ping + ' ms | FPS: ' + fps;
+    }
+
+    // Function to calculate FPS
+    function calculateFPS() {
+        var start = performance.now();
+        requestAnimationFrame(function() {
+            fps = Math.round(1000 / (performance.now() - start));
+            updateMonitor();
+            calculateFPS();
+        });
+    }
+
+    // Function to send a ping request and calculate ping
+    function pingRequest() {
+        var startTime = Date.now();
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', window.location.href, true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                ping = Date.now() - startTime;
+                updateMonitor();
+            }
+            setTimeout(pingRequest, 1000);
+        };
+        xhr.onerror = function() {
+            ping = 'N/A';
+            updateMonitor();
+            setTimeout(pingRequest, 1000);
+        };
+        xhr.send();
+    }
+
+    // Start monitoring ping and FPS
+    calculateFPS();
+    pingRequest();
+})();
+
+
+    //sep
+
+(function() {
+    'use strict';
+
+    // Create a div element to display the computer speed
+    var speedDisplay = document.createElement('div');
+    speedDisplay.style.position = 'fixed';
+    speedDisplay.style.bottom = '10px';
+    speedDisplay.style.right = '10px';
+    speedDisplay.style.padding = '10px';
+    speedDisplay.style.backgroundColor = '#000';
+    speedDisplay.style.color = '#fff';
+    speedDisplay.style.fontFamily = 'Arial, sans-serif';
+    speedDisplay.style.fontSize = '14px';
+    speedDisplay.style.zIndex = '9999';
+
+    // Function to calculate the computer speed
+    function calculateComputerSpeed() {
+        var startTime = performance.now();
+        var iterations = 0;
+
+        // Perform a lightweight computation task for 40 milliseconds
+        while (performance.now() - startTime < 40) {
+            Math.sqrt(iterations);
+            iterations++;
+        }
+
+        var speed = iterations / 40; // Calculate iterations per millisecond
+        var roundedSpeed = Math.round(speed * 100) / 100; // Round the speed to two decimal places
+
+        return roundedSpeed;
+    }
+
+    // Update the computer speed display periodically
+    function updateSpeedDisplay() {
+        var speed = calculateComputerSpeed();
+        speedDisplay.textContent = 'Computer Speed: ' + speed + ' iterations/ms';
+        setTimeout(updateSpeedDisplay, 1000); // Update every second
+    }
+
+    // Add the speed display to the document
+    document.body.appendChild(speedDisplay);
+
+    // Start updating the speed display
+    updateSpeedDisplay();
+})();
+  console.log("pc stats on");
+  activateButton("testZ");
+  // You can replace the console.log statement with your own code for the cheat functionality
+}
+
+document.querySelector("#test1").onclick = function () {
+  deactivateButton("test1");
+  test1();
+};
+
+document.querySelector("#test2").onclick = function () {
+  deactivateButton("test2");
+  test2();
+};
+
+document.querySelector("#test3").onclick = function () {
+  deactivateButton("test3");
+  test3();
+};
+
+document.querySelector("#test4").onclick = function () {
+  deactivateButton("test4");
+  test4();
+};
+
+document.querySelector("#test5").onclick = function () {
+  deactivateButton("test5");
+  test5();
+};
+
+document.querySelector("#test6").onclick = function () {
+  deactivateButton("test6");
+  test6();
+};
+
+document.querySelector("#test7").onclick = function () {
+  deactivateButton("test7");
+  test7();
+};
+
+document.querySelector("#test8").onclick = function () {
+  deactivateButton("test8");
+  test8();
+};
+
+document.querySelector("#test9").onclick = function () {
+  deactivateButton("test9");
+  test9();
+};
+
+document.querySelector("#test10").onclick = function () {
+  deactivateButton("test10");
+  test10();
+};
+
+document.querySelector("#testB").onclick = function () {
+  deactivateButton("testB");
+  testB();
+};
+
+document.querySelector("#testA").onclick = function () {
+  deactivateButton("testA");
+  testA();
+};
+
+document.querySelector("#testC").onclick = function () {
+  deactivateButton("testC");
+  testC();
+};
+
+document.querySelector("#testD").onclick = function () {
+  deactivateButton("testD");
+  testD();
+};
+
+document.querySelector("#testE").onclick = function () {
+  deactivateButton("testE");
+  testE();
+};
+
+document.querySelector("#testF").onclick = function () {
+  deactivateButton("testF");
+  testF();
+};
+
+document.querySelector("#testZ").onclick = function () {
+  deactivateButton("testZ");
+  testZ();
+};
+
+//external cheats
+
+//render check
+
+
