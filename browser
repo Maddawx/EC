@@ -1,0 +1,223 @@
+(function() {
+    'use strict';
+
+    const sessionStorageKey = 'simpleWebBrowserHistory';
+
+    // Create a container div for the browser
+    const browserContainer = document.createElement('div');
+    browserContainer.style.position = 'fixed';
+    browserContainer.style.top = '0';
+    browserContainer.style.left = '0';
+    browserContainer.style.width = '100%';
+    browserContainer.style.height = '100%';
+    document.body.appendChild(browserContainer);
+
+    // Create an input box for entering URLs
+    const urlInput = document.createElement('input');
+    urlInput.type = 'text';
+    urlInput.placeholder = 'Enter URL and press Enter';
+    urlInput.style.width = '70%';
+    browserContainer.appendChild(urlInput);
+
+    // Create a button to navigate to the entered URL
+    const goButton = document.createElement('button');
+    goButton.textContent = 'Go';
+    goButton.addEventListener('click', () => navigateTo(urlInput.value.trim()));
+    browserContainer.appendChild(goButton);
+
+    // Create a button to refresh the page
+    const refreshButton = document.createElement('button');
+    refreshButton.textContent = 'Refresh';
+    refreshButton.addEventListener('click', refreshPage);
+    browserContainer.appendChild(refreshButton);
+
+    // Create a button to view navigation history
+    const historyButton = document.createElement('button');
+    historyButton.textContent = 'View History';
+    historyButton.addEventListener('click', viewHistory);
+    browserContainer.appendChild(historyButton);
+
+    // Create a button to clear navigation history
+    const clearHistoryButton = document.createElement('button');
+    clearHistoryButton.textContent = 'Clear History';
+    clearHistoryButton.addEventListener('click', clearHistory);
+    historyButton.appendChild(clearHistoryButton);
+
+    // Create a button to open the dev console
+    const devConsoleButton = document.createElement('button');
+    devConsoleButton.textContent = 'Dev Console';
+    devConsoleButton.addEventListener('click', openDevConsole);
+    browserContainer.appendChild(devConsoleButton);
+
+    // Create an overlay for the history list
+    const historyOverlay = createOverlay();
+    const historyListContainer = document.createElement('div');
+    historyOverlay.appendChild(historyListContainer);
+
+    // Create an overlay for the dev console
+    const devConsoleOverlay = createOverlay();
+    const devConsoleContainer = document.createElement('div');
+    devConsoleOverlay.appendChild(devConsoleContainer);
+
+    // Create a button to close the history overlay
+    const closeHistoryButton = createCloseButton(historyOverlay);
+    historyOverlay.appendChild(closeHistoryButton);
+
+    // Create a button to close the dev console overlay
+    const closeDevConsoleButton = createCloseButton(devConsoleOverlay);
+    devConsoleOverlay.appendChild(closeDevConsoleButton);
+
+    // Create an iframe to display web content
+    const iframe = document.createElement('iframe');
+    iframe.style.width = '100%';
+    iframe.style.height = 'calc(100% - 40px)'; // Adjust the height based on the toolbar height
+    browserContainer.appendChild(iframe);
+
+    // Event listener for the URL input
+    urlInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            navigateTo(urlInput.value.trim());
+        }
+    });
+
+    // Initialize the iframe with the last visited URL or a default URL
+    const lastVisitedURL = getLastVisitedURL();
+    iframe.src = lastVisitedURL || 'https://www.example.com';
+
+    function navigateTo(url) {
+        iframe.src = url;
+
+        // Save the URL to the session storage for history
+        const historyList = getHistoryList();
+        historyList.push(url);
+        sessionStorage.setItem(sessionStorageKey, JSON.stringify(historyList));
+    }
+
+    function refreshPage() {
+        // Reload the iframe content
+        iframe.src = iframe.src;
+    }
+
+    function viewHistory() {
+        const historyList = getHistoryList();
+
+        // Clear previous history list content
+        clearChildren(historyListContainer);
+
+        // Display history list as clickable links
+        historyList.forEach((url) => {
+            const historyLink = document.createElement('a');
+            historyLink.href = '#'; // Prevent the link from navigating away
+            historyLink.textContent = url;
+            historyLink.style.display = 'block';
+            historyLink.style.padding = '5px';
+            historyLink.style.borderBottom = '1px solid #ddd';
+            historyLink.addEventListener('click', () => {
+                navigateTo(url);
+                historyOverlay.style.display = 'none';
+            });
+            historyListContainer.appendChild(historyLink);
+        });
+
+        // Display the history overlay
+        historyOverlay.style.display = 'block';
+    }
+
+    function clearHistory() {
+        sessionStorage.removeItem(sessionStorageKey);
+        alert('Navigation history has been cleared.');
+    }
+
+    function openDevConsole() {
+        // Clear previous dev console content
+        clearChildren(devConsoleContainer);
+
+        // Create textarea for code input
+        const codeInput = document.createElement('textarea');
+        codeInput.placeholder = 'Enter JavaScript code here';
+        codeInput.style.width = '100%';
+        codeInput.style.height = '100px';
+        devConsoleContainer.appendChild(codeInput);
+
+        // Create button to execute code
+        const executeButton = document.createElement('button');
+        executeButton.textContent = 'Execute';
+        executeButton.addEventListener('click', () => executeCode(codeInput.value));
+        devConsoleContainer.appendChild(executeButton);
+
+        // Create area to display errors and output
+        const outputArea = document.createElement('div');
+        outputArea.style.width = '100%';
+        outputArea.style.height = '150px';
+        outputArea.style.overflow = 'auto';
+        outputArea.style.border = '1px solid #ddd';
+        outputArea.style.padding = '10px';
+        devConsoleContainer.appendChild(outputArea);
+
+        // Display the dev console overlay
+        devConsoleOverlay.style.display = 'block';
+    }
+
+    function executeCode(code) {
+        try {
+            // Execute the code
+            const result = eval(code);
+            logOutput(result);
+        } catch (error) {
+            // Log any errors
+            logError(error);
+        }
+    }
+
+    function logOutput(output) {
+        const outputArea = devConsoleContainer.querySelector('div');
+        outputArea.innerHTML += `<div style="color: green;">${output}</div>`;
+    }
+
+    function logError(error) {
+        const outputArea = devConsoleContainer.querySelector('div');
+        outputArea.innerHTML += `<div style="color: red;">${error.message}</div>`;
+    }
+
+    function createOverlay() {
+        const overlay = document.createElement('div');
+        overlay.style.display = 'none';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        overlay.style.zIndex = '1000';
+        browserContainer.appendChild(overlay);
+        return overlay;
+    }
+
+    function createCloseButton(overlay) {
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.addEventListener('click', () => {
+            overlay.style.display = 'none';
+        });
+        return closeButton;
+    }
+
+    function getLastVisitedURL() {
+        const historyList = getHistoryList();
+        return historyList.length > 0 ? historyList[historyList.length - 1] : null;
+    }
+
+    function getHistoryList() {
+        const historyJSON = sessionStorage.getItem(sessionStorageKey);
+        return historyJSON ? JSON.parse(historyJSON) : [];
+    }
+
+    function clearChildren(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+})();
