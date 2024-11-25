@@ -1,0 +1,508 @@
+(function() {
+    'use strict';
+
+// Preset locations with names and coordinates
+const locations = {
+    "New York City, USA": { lat: 40.712776, long: -74.005974 },
+    "Los Angeles, USA": { lat: 34.052235, long: -118.243683 },
+    "Chicago, USA": { lat: 41.878113, long: -87.629799 },
+    "Tokyo, Japan": { lat: 35.682839, long: 139.759455 },
+    "Beijing, China": { lat: 39.904202, long: 116.407394 },
+    "Bangkok, Thailand": { lat: 13.756331, long: 100.501762 },
+    "Seoul, South Korea": { lat: 37.566536, long: 126.977966 },
+    "Mumbai, India": { lat: 19.076090, long: 72.877426 }
+};
+
+    let latitude = 40.712776; // Default to Eiffel Tower
+    let longitude = -74.005974;
+    let guiVisible = true; // Initially visible
+
+    // Function to spoof geolocation for getCurrentPosition and watchPosition
+    function spoofGeolocation() {
+        const geolocationSuccess = function(success) {
+            success({
+                coords: {
+                    latitude: latitude,
+                    longitude: longitude,
+                    accuracy: 100,
+                    altitude: null,
+                    altitudeAccuracy: null,
+                    heading: null,
+                    speed: null
+                }
+            });
+        };
+
+        // Override getCurrentPosition
+        navigator.geolocation.getCurrentPosition = function(success, error) {
+            geolocationSuccess(success);
+        };
+
+        // Override watchPosition
+        navigator.geolocation.watchPosition = function(success, error) {
+            geolocationSuccess(success);
+        };
+    }
+
+    // Function to update the spoofed location from preset
+    function updateLocation() {
+        const selectedLocation = document.getElementById('geo-location').value;
+        const { lat, long } = locations[selectedLocation];
+
+        latitude = lat;
+        longitude = long;
+
+        alert(`Geolocation updated to:\n${selectedLocation}\nLatitude: ${latitude}\nLongitude: ${longitude}`);
+
+        // Re-apply geolocation spoofing
+        spoofGeolocation();
+    }
+
+    // Initial spoof of geolocation
+    spoofGeolocation();
+
+    // Create and style the GUI
+    const gui = document.createElement('div');
+    gui.id = 'geo-spoofer-gui';
+    gui.style.position = 'fixed';
+    gui.style.bottom = '10px';
+    gui.style.right = '10px';
+    gui.style.padding = '10px';
+    gui.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    gui.style.color = 'white';
+    gui.style.zIndex = '9999';
+    gui.style.borderRadius = '5px';
+    gui.style.fontSize = '12px';
+    gui.style.fontFamily = 'Arial, sans-serif';
+
+    // GUI content: dropdown for selecting locations and buttons
+    gui.innerHTML = `
+        <h4 style="margin: 0 0 10px 0;">Browser Spoofer</h4>
+        <label for="geo-location">Select Location:</label>
+        <select id="geo-location" style="margin-bottom: 5px; width: 100%;">
+            ${Object.keys(locations).map(location => `<option value="${location}">${location}</option>`).join('')}
+        </select>
+        <button id="update-location" style="padding: 5px; width: 100%; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+            Update Location
+        </button>
+        <br><br>
+        <!-- Add 5 blank buttons for future use -->
+        <button id="custom-btn-1" style="padding: 5px; width: 100%; background-color: #f0ad4e; color: white; border: none; cursor: pointer;">UserAgent</button>
+        <button id="custom-btn-2" style="padding: 5px; width: 100%; background-color: #f0ad4e; color: white; border: none; cursor: pointer;">Referer</button>
+        <button id="custom-btn-3" style="padding: 5px; width: 100%; background-color: #f0ad4e; color: white; border: none; cursor: pointer;">Plugins</button>
+        <button id="custom-btn-4" style="padding: 5px; width: 100%; background-color: #f0ad4e; color: white; border: none; cursor: pointer;">WebRTC</button>
+        <button id="custom-btn-5" style="padding: 5px; width: 100%; background-color: #f0ad4e; color: white; border: none; cursor: pointer;">Platform</button>
+    `;
+
+    // Append the GUI to the body
+    document.body.appendChild(gui);
+
+    // Add event listener to the update location button
+    document.getElementById('update-location').addEventListener('click', updateLocation);
+
+    // Placeholder event listeners for custom buttons (to be customized later)
+    document.getElementById('custom-btn-1').addEventListener('click', function() {
+
+(function() {
+    'use strict';
+
+    // Create the User-Agent selection GUI
+    const userAgentList = [
+        { name: 'Chrome on Windows', value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' },
+        { name: 'Firefox on Windows', value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0' },
+        { name: 'Safari on macOS', value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15' },
+        { name: 'Edge on Windows', value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.864.41 Safari/537.36 Edg/91.0.864.41' }
+    ];
+
+    // Create the GUI
+    const gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.top = '50%';
+    gui.style.left = '50%';
+    gui.style.transform = 'translate(-50%, -50%)';
+    gui.style.backgroundColor = 'white';
+    gui.style.border = '1px solid #ccc';
+    gui.style.padding = '20px';
+    gui.style.zIndex = '10000';
+    gui.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    gui.innerHTML = '<h2>Select User-Agent</h2>';
+
+    // Add options to the GUI
+    userAgentList.forEach(agent => {
+        const button = document.createElement('button');
+        button.innerText = agent.name;
+        button.style.display = 'block';
+        button.style.margin = '10px 0';
+        button.onclick = () => {
+            spoofUserAgent(agent.value);
+            closeGui();
+        };
+        gui.appendChild(button);
+    });
+
+    // Add a close button
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Close';
+    closeButton.onclick = closeGui;
+    gui.appendChild(closeButton);
+
+    document.body.appendChild(gui);
+
+    // Function to spoof the User-Agent
+    function spoofUserAgent(userAgent) {
+        Object.defineProperty(navigator, 'userAgent', {
+            get: () => userAgent,
+        });
+    }
+
+    // Function to close the GUI
+    function closeGui() {
+        document.body.removeChild(gui);
+    }
+})();
+
+    });
+
+    document.getElementById('custom-btn-2').addEventListener('click', function() {
+
+(function() {
+    'use strict';
+
+    // Create the Referer selection GUI
+    const refererList = [
+        { name: 'Fake Referer 1', value: 'https://your-fake-referer.com' },
+        { name: 'Fake Referer 2', value: 'https://another-fake-referer.com' },
+        { name: 'Example Referer', value: 'https://example.com' },
+        { name: 'Test Referer', value: 'https://test.com' }
+    ];
+
+    // Create the GUI
+    const gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.top = '50%';
+    gui.style.left = '50%';
+    gui.style.transform = 'translate(-50%, -50%)';
+    gui.style.backgroundColor = 'white';
+    gui.style.border = '1px solid #ccc';
+    gui.style.padding = '20px';
+    gui.style.zIndex = '10000';
+    gui.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    gui.innerHTML = '<h2>Select Referer</h2>';
+
+    // Add options to the GUI
+    refererList.forEach(ref => {
+        const button = document.createElement('button');
+        button.innerText = ref.name;
+        button.style.display = 'block';
+        button.style.margin = '10px 0';
+        button.onclick = () => {
+            modifyReferer(ref.value);
+            closeGui();
+        };
+        gui.appendChild(button);
+    });
+
+    // Add a close button
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Close';
+    closeButton.onclick = closeGui;
+    gui.appendChild(closeButton);
+
+    document.body.appendChild(gui);
+
+    // Function to modify the Referer
+    function modifyReferer(referer) {
+        Object.defineProperty(document, 'referrer', {
+            get: () => referer,
+        });
+    }
+
+    // Function to close the GUI
+    function closeGui() {
+        document.body.removeChild(gui);
+    }
+})();
+
+    });
+
+    document.getElementById('custom-btn-3').addEventListener('click', function() {
+
+(function() {
+    'use strict';
+
+    // Create the GUI
+    const gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.top = '50%';
+    gui.style.left = '50%';
+    gui.style.transform = 'translate(-50%, -50%)';
+    gui.style.backgroundColor = 'white';
+    gui.style.border = '1px solid #ccc';
+    gui.style.padding = '20px';
+    gui.style.zIndex = '10000';
+    gui.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    gui.innerHTML = '<h2>Plugin Spoofer</h2>';
+
+    // Buttons for enabling and disabling plugin detection
+    const disableButton = document.createElement('button');
+    disableButton.innerText = 'Disable Plugin Detection';
+    disableButton.style.display = 'block';
+    disableButton.style.margin = '10px 0';
+    disableButton.onclick = disablePluginDetection;
+    gui.appendChild(disableButton);
+
+    const enableButton = document.createElement('button');
+    enableButton.innerText = 'Enable Plugin Detection';
+    enableButton.style.display = 'block';
+    enableButton.style.margin = '10px 0';
+    enableButton.onclick = enablePluginDetection;
+    gui.appendChild(enableButton);
+
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Close';
+    closeButton.onclick = closeGui;
+    gui.appendChild(closeButton);
+
+    document.body.appendChild(gui);
+
+    // Store original plugin properties
+    const originalPlugins = navigator.plugins;
+    const originalMimeTypes = navigator.mimeTypes;
+
+    // Function to disable plugin detection
+    function disablePluginDetection() {
+        // Override navigator.plugins
+        Object.defineProperty(navigator, 'plugins', {
+            get: function() {
+                return {
+                    0: { name: 'Fake Plugin', description: 'This is a spoofed plugin' },
+                    length: 1
+                };
+            }
+        });
+
+        // Override navigator.mimeTypes
+        Object.defineProperty(navigator, 'mimeTypes', {
+            get: function() {
+                return {
+                    0: { type: 'application/fake', suffixes: 'fake' },
+                    length: 1
+                };
+            }
+        });
+
+        alert("Plugin detection has been disabled.");
+    }
+
+    // Function to enable plugin detection
+    function enablePluginDetection() {
+        // Restore the original plugin properties
+        Object.defineProperty(navigator, 'plugins', {
+            value: originalPlugins,
+            configurable: true,
+            enumerable: true,
+            writable: true
+        });
+
+        Object.defineProperty(navigator, 'mimeTypes', {
+            value: originalMimeTypes,
+            configurable: true,
+            enumerable: true,
+            writable: true
+        });
+
+        alert("Plugin detection has been enabled.");
+    }
+
+    // Function to close the GUI
+    function closeGui() {
+        document.body.removeChild(gui);
+    }
+})();
+
+
+
+    });
+
+    document.getElementById('custom-btn-4').addEventListener('click', function() {
+
+        (function() {
+    'use strict';
+
+    // Create the GUI
+    const gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.top = '50%';
+    gui.style.left = '50%';
+    gui.style.transform = 'translate(-50%, -50%)';
+    gui.style.backgroundColor = 'white';
+    gui.style.border = '1px solid #ccc';
+    gui.style.padding = '20px';
+    gui.style.zIndex = '10000';
+    gui.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    gui.innerHTML = '<h2>WebRTC Control</h2>';
+
+    // Buttons for enabling and disabling WebRTC
+    const disableButton = document.createElement('button');
+    disableButton.innerText = 'Disable WebRTC';
+    disableButton.style.display = 'block';
+    disableButton.style.margin = '10px 0';
+    disableButton.onclick = disableWebRTC;
+    gui.appendChild(disableButton);
+
+    const enableButton = document.createElement('button');
+    enableButton.innerText = 'Enable WebRTC';
+    enableButton.style.display = 'block';
+    enableButton.style.margin = '10px 0';
+    enableButton.onclick = enableWebRTC;
+    gui.appendChild(enableButton);
+
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Close';
+    closeButton.onclick = closeGui;
+    gui.appendChild(closeButton);
+
+    document.body.appendChild(gui);
+
+    // Store original methods
+    const originalGetUserMedia = navigator.mediaDevices.getUserMedia;
+    const originalRTCPeerConnection = window.RTCPeerConnection;
+    const originalRTCDataChannel = window.RTCDataChannel;
+    const originalRTCPeerConnectionPrototypeCreateOffer = window.RTCPeerConnection.prototype.createOffer;
+    const originalRTCPeerConnectionPrototypeCreateAnswer = window.RTCPeerConnection.prototype.createAnswer;
+
+    // Function to disable WebRTC
+    function disableWebRTC() {
+        // Override getUserMedia
+        navigator.mediaDevices.getUserMedia = function() {
+            return Promise.reject(new Error("WebRTC Disabled"));
+        };
+
+        // Override RTCPeerConnection
+        window.RTCPeerConnection = function() {
+            throw new Error("WebRTC Disabled");
+        };
+
+        // Override RTCDataChannel
+        window.RTCDataChannel = function() {
+            throw new Error("WebRTC Disabled");
+        };
+
+        // Override RTCPeerConnection methods
+        window.RTCPeerConnection.prototype.createOffer = function() {
+            throw new Error("WebRTC Disabled");
+        };
+
+        window.RTCPeerConnection.prototype.createAnswer = function() {
+            throw new Error("WebRTC Disabled");
+        };
+
+        // Prevent access to the getUserMedia property directly
+        Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+            value: function() {
+                return Promise.reject(new Error("WebRTC Disabled"));
+            }
+        });
+
+        alert("WebRTC has been disabled.");
+    }
+
+    // Function to enable WebRTC
+    function enableWebRTC() {
+        // Restore the original methods
+        navigator.mediaDevices.getUserMedia = originalGetUserMedia;
+        window.RTCPeerConnection = originalRTCPeerConnection;
+        window.RTCDataChannel = originalRTCDataChannel;
+        window.RTCPeerConnection.prototype.createOffer = originalRTCPeerConnectionPrototypeCreateOffer;
+        window.RTCPeerConnection.prototype.createAnswer = originalRTCPeerConnectionPrototypeCreateAnswer;
+
+        alert("WebRTC has been enabled.");
+    }
+
+    // Function to close the GUI
+    function closeGui() {
+        document.body.removeChild(gui);
+    }
+})();
+
+
+    });
+
+    document.getElementById('custom-btn-5').addEventListener('click', function() {
+
+(function() {
+    'use strict';
+
+    // Create the GUI
+    const gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.top = '50%';
+    gui.style.left = '50%';
+    gui.style.transform = 'translate(-50%, -50%)';
+    gui.style.backgroundColor = 'white';
+    gui.style.border = '1px solid #ccc';
+    gui.style.padding = '20px';
+    gui.style.zIndex = '10000';
+    gui.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    gui.innerHTML = '<h2>Select Platform</h2>';
+
+    // Platform options
+    const platformList = [
+        { name: 'Linux', value: 'Linux x86_64' },
+        { name: 'Windows', value: 'Win32' },
+        { name: 'macOS', value: 'MacIntel' },
+        { name: 'Android', value: 'Linux armv8l' }
+    ];
+
+    // Add options to the GUI
+    platformList.forEach(platform => {
+        const button = document.createElement('button');
+        button.innerText = platform.name;
+        button.style.display = 'block';
+        button.style.margin = '10px 0';
+        button.onclick = () => {
+            spoofPlatform(platform.value);
+            closeGui();
+        };
+        gui.appendChild(button);
+    });
+
+    // Add a close button
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'Close';
+    closeButton.onclick = closeGui;
+    gui.appendChild(closeButton);
+
+    document.body.appendChild(gui);
+
+    // Function to spoof navigator platform
+    function spoofPlatform(platform) {
+        Object.defineProperty(navigator, 'platform', {
+            get: () => platform,
+        });
+    }
+
+    // Function to close the GUI
+    function closeGui() {
+        document.body.removeChild(gui);
+    }
+})();
+
+
+    });
+
+    // Function to toggle the visibility of the GUI
+    function toggleGUI() {
+        const guiElement = document.getElementById('geo-spoofer-gui');
+        guiVisible = !guiVisible;
+        guiElement.style.display = guiVisible ? 'block' : 'none';
+    }
+
+    // Event listener to listen for the '/' key press to toggle GUI
+    document.addEventListener('keydown', function(event) {
+        if (event.key === '/') {
+            toggleGUI();
+        }
+    });
+
+})();
