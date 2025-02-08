@@ -1,0 +1,19 @@
+(function() {
+    // Prompt the user for a filename
+    let filename = prompt("Enter the filename for the HTML file:", "page_source.html");
+    if (!filename) return; // Exit if the user cancels
+
+    // Get the entire HTML content
+    let htmlContent = document.documentElement.outerHTML;
+
+    // Create a Blob and generate a download link
+    let blob = new Blob([htmlContent], { type: "text/html" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    
+    // Append to body, trigger download, and remove the element
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+})();
