@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Mini Game Container (Draggable, Styled & Save Games)
+// @name         Mini Game Container (Resizable & Terminatable)
 // @namespace    http://tampermonkey.net/
-// @version      1.4
-// @description  A draggable, stylish game container with save/load functionality for JS games
+// @version      1.5
+// @description  A draggable, resizable, and stylized game container with save/load and terminate options
 // @author       You
 // @match        *://*/*
 // @grant        none
@@ -13,12 +13,12 @@
 
     const STORAGE_KEY = "savedGames"; // Local storage key
 
-    // Load saved games from storage
+    // Load saved games
     function loadSavedGames() {
         return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     }
 
-    // Save games back to storage
+    // Save games to local storage
     function saveGames(games) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     }
@@ -41,7 +41,10 @@
         borderRadius: "8px",
         fontFamily: "Arial, sans-serif",
         color: "white",
-        overflow: "hidden"
+        overflow: "hidden",
+        resize: "both",
+        minWidth: "250px",
+        minHeight: "250px"
     });
 
     // Header for dragging
@@ -72,7 +75,6 @@
         border: "1px solid #555",
         borderRadius: "5px"
     });
-    gameSelector.innerHTML = "<option value=''>-- Select a Game --</option>";
 
     // Load saved games into dropdown
     function updateGameSelector() {
@@ -102,56 +104,30 @@
     });
     textarea.placeholder = "Enter JavaScript game code...";
 
-    // "Run Game" button
-    let runButton = document.createElement("button");
-    Object.assign(runButton.style, {
-        marginTop: "5px",
-        padding: "7px",
-        backgroundColor: "#4CAF50",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-        fontSize: "14px",
-        borderRadius: "5px",
-        transition: "0.2s"
-    });
-    runButton.innerText = "▶ Run Game";
-    runButton.onmouseover = () => runButton.style.backgroundColor = "#45a049";
-    runButton.onmouseout = () => runButton.style.backgroundColor = "#4CAF50";
+    // Create buttons
+    function createButton(text, bgColor, hoverColor) {
+        let button = document.createElement("button");
+        Object.assign(button.style, {
+            marginTop: "5px",
+            padding: "7px",
+            backgroundColor: bgColor,
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "14px",
+            borderRadius: "5px",
+            transition: "0.2s"
+        });
+        button.innerText = text;
+        button.onmouseover = () => button.style.backgroundColor = hoverColor;
+        button.onmouseout = () => button.style.backgroundColor = bgColor;
+        return button;
+    }
 
-    // "Save Game" button
-    let saveButton = document.createElement("button");
-    Object.assign(saveButton.style, {
-        marginTop: "5px",
-        padding: "7px",
-        backgroundColor: "#2196F3",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-        fontSize: "14px",
-        borderRadius: "5px",
-        transition: "0.2s"
-    });
-    saveButton.innerText = "💾 Save Game";
-    saveButton.onmouseover = () => saveButton.style.backgroundColor = "#1e87dc";
-    saveButton.onmouseout = () => saveButton.style.backgroundColor = "#2196F3";
-
-    // "Delete Game" button
-    let deleteButton = document.createElement("button");
-    Object.assign(deleteButton.style, {
-        marginTop: "5px",
-        padding: "7px",
-        backgroundColor: "#f44336",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-        fontSize: "14px",
-        borderRadius: "5px",
-        transition: "0.2s"
-    });
-    deleteButton.innerText = "🗑 Delete Game";
-    deleteButton.onmouseover = () => deleteButton.style.backgroundColor = "#d32f2f";
-    deleteButton.onmouseout = () => deleteButton.style.backgroundColor = "#f44336";
+    let runButton = createButton("▶ Run Game", "#4CAF50", "#45a049");
+    let saveButton = createButton("💾 Save Game", "#2196F3", "#1e87dc");
+    let deleteButton = createButton("🗑 Delete Game", "#f44336", "#d32f2f");
+    let terminateButton = createButton("⛔ Terminate Game", "#ff9800", "#e68900");
 
     // Iframe for game
     let iframe = document.createElement("iframe");
@@ -214,6 +190,12 @@
         }
     };
 
+    // Terminate the running game
+    terminateButton.onclick = function() {
+        iframe.src = "about:blank"; // Wipes the iframe, effectively stopping any running scripts
+        alert("Game Terminated!");
+    };
+
     // Make container draggable
     let isDragging = false, startX, startY, initialX, initialY;
     header.onmousedown = function(e) {
@@ -232,7 +214,7 @@
     }
 
     // Append elements
-    container.append(header, gameSelector, textarea, runButton, saveButton, deleteButton, iframe);
+    container.append(header, gameSelector, textarea, runButton, saveButton, deleteButton, terminateButton, iframe);
     document.body.appendChild(container);
     updateGameSelector();
 })();
