@@ -1,5 +1,27 @@
+// ==UserScript==
+// @name         Mini Game Container (Draggable, Styled & Save Games)
+// @namespace    http://tampermonkey.net/
+// @version      1.4
+// @description  A draggable, stylish game container with save/load functionality for JS games
+// @author       You
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
 (function() {
     'use strict';
+
+    const STORAGE_KEY = "savedGames"; // Local storage key
+
+    // Load saved games from storage
+    function loadSavedGames() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    }
+
+    // Save games back to storage
+    function saveGames(games) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    }
 
     // Create the main container
     let container = document.createElement("div");
@@ -8,7 +30,7 @@
         bottom: "50px",
         right: "50px",
         width: "320px",
-        height: "350px",
+        height: "400px",
         backgroundColor: "#222",
         border: "2px solid #444",
         padding: "10px",
@@ -22,7 +44,7 @@
         overflow: "hidden"
     });
 
-    // Create a header bar (for dragging)
+    // Header for dragging
     let header = document.createElement("div");
     Object.assign(header.style, {
         width: "100%",
@@ -39,7 +61,32 @@
     });
     header.innerText = "🎮 Mini Game Runner";
 
-    // Create a small textarea for input
+    // Dropdown to load saved games
+    let gameSelector = document.createElement("select");
+    Object.assign(gameSelector.style, {
+        width: "100%",
+        padding: "5px",
+        marginTop: "5px",
+        backgroundColor: "#111",
+        color: "#ddd",
+        border: "1px solid #555",
+        borderRadius: "5px"
+    });
+    gameSelector.innerHTML = "<option value=''>-- Select a Game --</option>";
+
+    // Load saved games into dropdown
+    function updateGameSelector() {
+        let games = loadSavedGames();
+        gameSelector.innerHTML = "<option value=''>-- Select a Game --</option>";
+        Object.keys(games).forEach(gameName => {
+            let option = document.createElement("option");
+            option.value = gameName;
+            option.innerText = gameName;
+            gameSelector.appendChild(option);
+        });
+    }
+
+    // Textarea for input
     let textarea = document.createElement("textarea");
     Object.assign(textarea.style, {
         width: "100%",
@@ -50,11 +97,12 @@
         border: "1px solid #555",
         borderRadius: "5px",
         backgroundColor: "#111",
-        color: "#ddd"
+        color: "#ddd",
+        marginTop: "5px"
     });
     textarea.placeholder = "Enter JavaScript game code...";
 
-    // Create a "Run Game" button
+    // "Run Game" button
     let runButton = document.createElement("button");
     Object.assign(runButton.style, {
         marginTop: "5px",
@@ -71,7 +119,41 @@
     runButton.onmouseover = () => runButton.style.backgroundColor = "#45a049";
     runButton.onmouseout = () => runButton.style.backgroundColor = "#4CAF50";
 
-    // Create an iframe to run the game
+    // "Save Game" button
+    let saveButton = document.createElement("button");
+    Object.assign(saveButton.style, {
+        marginTop: "5px",
+        padding: "7px",
+        backgroundColor: "#2196F3",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "14px",
+        borderRadius: "5px",
+        transition: "0.2s"
+    });
+    saveButton.innerText = "💾 Save Game";
+    saveButton.onmouseover = () => saveButton.style.backgroundColor = "#1e87dc";
+    saveButton.onmouseout = () => saveButton.style.backgroundColor = "#2196F3";
+
+    // "Delete Game" button
+    let deleteButton = document.createElement("button");
+    Object.assign(deleteButton.style, {
+        marginTop: "5px",
+        padding: "7px",
+        backgroundColor: "#f44336",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "14px",
+        borderRadius: "5px",
+        transition: "0.2s"
+    });
+    deleteButton.innerText = "🗑 Delete Game";
+    deleteButton.onmouseover = () => deleteButton.style.backgroundColor = "#d32f2f";
+    deleteButton.onmouseout = () => deleteButton.style.backgroundColor = "#f44336";
+
+    // Iframe for game
     let iframe = document.createElement("iframe");
     Object.assign(iframe.style, {
         width: "100%",
@@ -82,25 +164,58 @@
         borderRadius: "5px"
     });
 
-    // Execute user input inside the iframe
+    // Run the game
     runButton.onclick = function() {
         let gameCode = textarea.value;
         let iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-        // Reset iframe to clear previous game
+        // Reset iframe
         iframeDoc.open();
         iframeDoc.write(`<html><body></body></html>`);
         iframeDoc.close();
 
-        // Inject script to run the game
+        // Inject script
         let script = iframeDoc.createElement("script");
         script.textContent = gameCode;
         iframeDoc.body.appendChild(script);
     };
 
-    // Make the container draggable
-    let isDragging = false, startX, startY, initialX, initialY;
+    // Save the game
+    saveButton.onclick = function() {
+        let gameName = prompt("Enter a name for this game:");
+        if (gameName) {
+            let games = loadSavedGames();
+            games[gameName] = textarea.value;
+            saveGames(games);
+            updateGameSelector();
+            alert(`Game "${gameName}" saved!`);
+        }
+    };
 
+    // Load selected game
+    gameSelector.onchange = function() {
+        let games = loadSavedGames();
+        let selectedGame = gameSelector.value;
+        if (selectedGame && games[selectedGame]) {
+            textarea.value = games[selectedGame];
+        }
+    };
+
+    // Delete selected game
+    deleteButton.onclick = function() {
+        let selectedGame = gameSelector.value;
+        if (selectedGame && confirm(`Delete "${selectedGame}"?`)) {
+            let games = loadSavedGames();
+            delete games[selectedGame];
+            saveGames(games);
+            updateGameSelector();
+            textarea.value = "";
+            alert(`Game "${selectedGame}" deleted!`);
+        }
+    };
+
+    // Make container draggable
+    let isDragging = false, startX, startY, initialX, initialY;
     header.onmousedown = function(e) {
         isDragging = true;
         startX = e.clientX;
@@ -110,19 +225,14 @@
         document.onmousemove = onMouseMove;
         document.onmouseup = () => { isDragging = false; document.onmousemove = null; };
     };
-
     function onMouseMove(e) {
         if (!isDragging) return;
-        let dx = e.clientX - startX;
-        let dy = e.clientY - startY;
-        container.style.left = `${initialX + dx}px`;
-        container.style.top = `${initialY + dy}px`;
+        container.style.left = `${initialX + (e.clientX - startX)}px`;
+        container.style.top = `${initialY + (e.clientY - startY)}px`;
     }
 
     // Append elements
-    container.appendChild(header);
-    container.appendChild(textarea);
-    container.appendChild(runButton);
-    container.appendChild(iframe);
+    container.append(header, gameSelector, textarea, runButton, saveButton, deleteButton, iframe);
     document.body.appendChild(container);
+    updateGameSelector();
 })();
