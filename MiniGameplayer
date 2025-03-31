@@ -1,0 +1,128 @@
+(function() {
+    'use strict';
+
+    // Create the main container
+    let container = document.createElement("div");
+    Object.assign(container.style, {
+        position: "fixed",
+        bottom: "50px",
+        right: "50px",
+        width: "320px",
+        height: "350px",
+        backgroundColor: "#222",
+        border: "2px solid #444",
+        padding: "10px",
+        zIndex: "10000",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "3px 3px 15px rgba(0,0,0,0.5)",
+        borderRadius: "8px",
+        fontFamily: "Arial, sans-serif",
+        color: "white",
+        overflow: "hidden"
+    });
+
+    // Create a header bar (for dragging)
+    let header = document.createElement("div");
+    Object.assign(header.style, {
+        width: "100%",
+        height: "30px",
+        backgroundColor: "#333",
+        cursor: "move",
+        textAlign: "center",
+        fontSize: "14px",
+        fontWeight: "bold",
+        lineHeight: "30px",
+        borderTopLeftRadius: "6px",
+        borderTopRightRadius: "6px",
+        userSelect: "none"
+    });
+    header.innerText = "🎮 Mini Game Runner";
+
+    // Create a small textarea for input
+    let textarea = document.createElement("textarea");
+    Object.assign(textarea.style, {
+        width: "100%",
+        height: "60px",
+        resize: "none",
+        fontSize: "12px",
+        padding: "5px",
+        border: "1px solid #555",
+        borderRadius: "5px",
+        backgroundColor: "#111",
+        color: "#ddd"
+    });
+    textarea.placeholder = "Enter JavaScript game code...";
+
+    // Create a "Run Game" button
+    let runButton = document.createElement("button");
+    Object.assign(runButton.style, {
+        marginTop: "5px",
+        padding: "7px",
+        backgroundColor: "#4CAF50",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "14px",
+        borderRadius: "5px",
+        transition: "0.2s"
+    });
+    runButton.innerText = "▶ Run Game";
+    runButton.onmouseover = () => runButton.style.backgroundColor = "#45a049";
+    runButton.onmouseout = () => runButton.style.backgroundColor = "#4CAF50";
+
+    // Create an iframe to run the game
+    let iframe = document.createElement("iframe");
+    Object.assign(iframe.style, {
+        width: "100%",
+        height: "200px",
+        border: "1px solid #555",
+        backgroundColor: "black",
+        marginTop: "10px",
+        borderRadius: "5px"
+    });
+
+    // Execute user input inside the iframe
+    runButton.onclick = function() {
+        let gameCode = textarea.value;
+        let iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+        // Reset iframe to clear previous game
+        iframeDoc.open();
+        iframeDoc.write(`<html><body></body></html>`);
+        iframeDoc.close();
+
+        // Inject script to run the game
+        let script = iframeDoc.createElement("script");
+        script.textContent = gameCode;
+        iframeDoc.body.appendChild(script);
+    };
+
+    // Make the container draggable
+    let isDragging = false, startX, startY, initialX, initialY;
+
+    header.onmousedown = function(e) {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialX = container.offsetLeft;
+        initialY = container.offsetTop;
+        document.onmousemove = onMouseMove;
+        document.onmouseup = () => { isDragging = false; document.onmousemove = null; };
+    };
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+        container.style.left = `${initialX + dx}px`;
+        container.style.top = `${initialY + dy}px`;
+    }
+
+    // Append elements
+    container.appendChild(header);
+    container.appendChild(textarea);
+    container.appendChild(runButton);
+    container.appendChild(iframe);
+    document.body.appendChild(container);
+})();
