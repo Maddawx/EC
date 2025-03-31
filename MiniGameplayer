@@ -1,12 +1,4 @@
-// ==UserScript==
-// @name         Mini Game Container (Resizable & Terminatable)
-// @namespace    http://tampermonkey.net/
-// @version      1.5
-// @description  A draggable, resizable, and stylized game container with save/load and terminate options
-// @author       You
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
+
 
 (function() {
     'use strict';
