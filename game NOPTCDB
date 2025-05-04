@@ -1,0 +1,378 @@
+// ==UserScript==
+// @name         Auto Open HTML in New Window
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Opens provided HTML content in a new window automatically
+// @author       You
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // Your HTML content here (use backticks for multiline strings)
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Moddable Tank Game with Developer Console</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas {
+      background-color: lightgray;
+      display: block;
+      margin: auto;
+    }
+    #consoleContainer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 250px;
+      background: #111;
+      color: #0f0;
+      font-family: monospace;
+      display: none;
+      flex-direction: row;
+    }
+    #consoleInput {
+      flex: 2;
+      background: black;
+      color: #0f0;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+    }
+    #consoleButtons {
+      display: flex;
+      gap: 5px;
+      padding: 5px;
+      background: #222;
+    }
+    #quickTools {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+      padding: 10px;
+      color: white;
+    }
+    #quickTools button {
+      background: #333;
+      border: none;
+      color: #0f0;
+      margin: 2px 0;
+      padding: 5px;
+      cursor: pointer;
+      text-align: left;
+    }
+    #quickTools button:hover {
+      background: #444;
+    }
+    #fpsCounter, #playerInfo {
+      position: fixed;
+      top: 5px;
+      left: 5px;
+      color: black;
+      background: rgba(255,255,255,0.7);
+      font-family: monospace;
+      padding: 2px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    #playerInfo { top: 30px; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <div id="fpsCounter" style="display: none;"></div>
+  <div id="playerInfo" style="display: none;"></div>
+
+  <div id="consoleContainer">
+    <div id="quickTools">
+      <strong>Quick Tools</strong>
+      <button onclick="importScript()">Import Script</button>
+      <input type="file" id="fileInput" style="display:none;" />
+      <button onclick="exportScript()">Export Script</button>
+      <button onclick="toggleFPS()">Toggle FPS</button>
+      <button onclick="toggleGrid()">Toggle Grid</button>
+      <button onclick="toggleAxis()">Toggle Axis Helper</button>
+      <button onclick="toggleHitbox()">Toggle Hitbox</button>
+      <button onclick="togglePlayerInfo()">Toggle Player Info</button>
+    </div>
+    <div style="flex: 2; display: flex; flex-direction: column;">
+      <div id="consoleButtons">
+        <button onclick="runConsoleCode()">Run</button>
+        <button onclick="clearConsole()">Clear</button>
+        <button onclick="toggleConsole()">Close Console</button>
+      </div>
+      <textarea id="consoleInput" placeholder="// Write your mod code here..." rows="10"></textarea>
+    </div>
+  </div>
+
+  <script>
+    let showGrid = false;
+    let showAxis = false;
+    let showHitbox = false;
+    let showPlayerInfo = false;
+    let showFPS = false;
+    let lastFrameTime = performance.now();
+    let fps = 0;
+
+    class GameObject {
+      constructor(x, y, size, color) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.color = color;
+        this.angle = 0;
+        this.speed = 0;
+      }
+
+      update() {}
+
+      draw(ctx, cameraX, cameraY) {
+        ctx.save();
+        ctx.translate(this.x - cameraX, this.y - cameraY);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+
+        if (showAxis) {
+          ctx.strokeStyle = "red";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(this.size, 0);
+          ctx.stroke();
+        }
+
+        if (showHitbox) {
+          ctx.strokeStyle = "yellow";
+          ctx.strokeRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    class Player extends GameObject {
+      constructor(x, y) {
+        super(x, y, 20, "blue");
+      }
+
+      update(keys) {
+        if (keys["ArrowUp"]) this.speed = 2;
+        else if (keys["ArrowDown"]) this.speed = -2;
+        else this.speed = 0;
+
+        if (keys["ArrowLeft"]) this.angle -= 0.05;
+        if (keys["ArrowRight"]) this.angle += 0.05;
+
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+      }
+    }
+
+    class InputHandler {
+      constructor() {
+        this.keys = {};
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "`") toggleConsole();
+          else this.keys[e.key] = true;
+        });
+        window.addEventListener("keyup", (e) => (this.keys[e.key] = false));
+      }
+    }
+
+    class Terrain {
+      constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.tileSize = 20;
+        this.terrain = [];
+        this.generateTerrain();
+      }
+
+      generateTerrain() {
+        for (let x = 0; x < this.width; x++) {
+          this.terrain[x] = [];
+          for (let y = 0; y < this.height; y++) {
+            this.terrain[x][y] = Math.random() < 0.15 ? 1 : 0;
+          }
+        }
+      }
+
+      draw(ctx, cameraX, cameraY) {
+        for (let x = 0; x < this.width; x++) {
+          for (let y = 0; y < this.height; y++) {
+            if (this.terrain[x][y] === 1) {
+              ctx.fillStyle = "green";
+              ctx.fillRect(
+                x * this.tileSize - cameraX,
+                y * this.tileSize - cameraY,
+                this.tileSize,
+                this.tileSize
+              );
+            }
+            if (showGrid) {
+              ctx.strokeStyle = "rgba(0,0,0,0.1)";
+              ctx.strokeRect(
+                x * this.tileSize - cameraX,
+                y * this.tileSize - cameraY,
+                this.tileSize,
+                this.tileSize
+              );
+            }
+          }
+        }
+      }
+    }
+
+    class Camera {
+      constructor(canvasWidth, canvasHeight, worldWidth, worldHeight) {
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
+        this.x = 0;
+        this.y = 0;
+      }
+
+      update(playerX, playerY) {
+        this.x = Math.max(0, Math.min(this.worldWidth - this.canvasWidth, playerX - this.canvasWidth / 2));
+        this.y = Math.max(0, Math.min(this.worldHeight - this.canvasHeight, playerY - this.canvasHeight / 2));
+      }
+    }
+
+    class Game {
+      constructor() {
+        this.canvas = document.getElementById("gameCanvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.input = new InputHandler();
+        this.terrain = new Terrain(200, 200);
+        this.player = new Player(this.terrain.width * this.terrain.tileSize / 2, this.terrain.height * this.terrain.tileSize / 2);
+        this.camera = new Camera(
+          this.canvas.width,
+          this.canvas.height,
+          this.terrain.width * this.terrain.tileSize,
+          this.terrain.height * this.terrain.tileSize
+        );
+        this.gameLoop();
+      }
+
+      update() {
+        this.player.update(this.input.keys);
+        this.camera.update(this.player.x, this.player.y);
+      }
+
+      draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.terrain.draw(this.ctx, this.camera.x, this.camera.y);
+        this.player.draw(this.ctx, this.camera.x, this.camera.y);
+        if (showFPS) {
+          const now = performance.now();
+          fps = 1000 / (now - lastFrameTime);
+          lastFrameTime = now;
+          document.getElementById("fpsCounter").innerText = "FPS: " + fps.toFixed(1);
+        }
+        if (showPlayerInfo) {
+          const info = `X: ${this.player.x.toFixed(1)}\nY: ${this.player.y.toFixed(1)}\nSpeed: ${this.player.speed}\nAngle: ${this.player.angle.toFixed(2)}`;
+          document.getElementById("playerInfo").innerText = info;
+        }
+      }
+
+      gameLoop() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.gameLoop());
+      }
+    }
+
+    const game = new Game();
+    const player = game.player;
+    const terrain = game.terrain;
+    const camera = game.camera;
+
+    function toggleConsole() {
+      const el = document.getElementById("consoleContainer");
+      el.style.display = el.style.display === "flex" ? "none" : "flex";
+    }
+
+    function runConsoleCode() {
+      const code = document.getElementById("consoleInput").value;
+      try {
+        const result = eval(code);
+        console.log("Result:", result);
+      } catch (e) {
+        alert("Error: " + e.message);
+      }
+    }
+
+    function clearConsole() {
+      document.getElementById("consoleInput").value = "";
+    }
+
+    function toggleFPS() {
+      showFPS = !showFPS;
+      document.getElementById("fpsCounter").style.display = showFPS ? "block" : "none";
+    }
+
+    function toggleGrid() {
+      showGrid = !showGrid;
+    }
+
+    function toggleAxis() {
+      showAxis = !showAxis;
+    }
+
+    function toggleHitbox() {
+      showHitbox = !showHitbox;
+    }
+
+    function togglePlayerInfo() {
+      showPlayerInfo = !showPlayerInfo;
+      document.getElementById("playerInfo").style.display = showPlayerInfo ? "block" : "none";
+    }
+
+    function importScript() {
+      const input = document.getElementById("fileInput");
+      input.click();
+      input.onchange = () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          document.getElementById("consoleInput").value = reader.result;
+        };
+        reader.readAsText(file);
+      };
+    }
+
+    function exportScript() {
+      const code = document.getElementById("consoleInput").value;
+      const blob = new Blob([code], { type: "text/javascript" });
+      const link = document.createElement("a");
+      link.download = "mod.js";
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+  </script>
+</body>
+</html>
+
+    `;
+
+    // Open a new window and write the HTML
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+        newWindow.document.open();
+        newWindow.document.write(htmlContent);
+        newWindow.document.close();
+    } else {
+        alert("Popup blocked! Please allow popups for this site.");
+    }
+})();
